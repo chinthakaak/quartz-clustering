@@ -69,7 +69,8 @@ public class QuartzWs {
     public static class QuartzJob implements Job {
 
         public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-            System.out.println("Executing job: "+jobExecutionContext.getFireInstanceId() +" "+ jobExecutionContext.getFireTime());
+            System.out.println("Executing job: "+jobExecutionContext.getJobDetail().getKey().getName()
+                    +" "+ jobExecutionContext.getFireTime()+" "+jobExecutionContext.getFireInstanceId());
         }
     }
     @WebService(endpointInterface = "com.examples.QuartzWs$QuartzService")
@@ -87,7 +88,7 @@ public class QuartzWs {
         }
         public void addJob(String jobName, int interval) throws SchedulerException {
             System.out.println("Adding a job to scheduler: " + jobName);
-            JobDetail jobDetail =  newJob(QuartzJob.class).build();
+            JobDetail jobDetail =  newJob(QuartzJob.class).withIdentity(jobName).build();
             Trigger trigger = newTrigger().startAt(DateBuilder.futureDate(interval, DateBuilder.IntervalUnit.SECOND)).build();
             scheduler.scheduleJob(jobDetail, trigger);
         }

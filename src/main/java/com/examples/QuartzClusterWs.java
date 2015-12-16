@@ -51,8 +51,8 @@ public class QuartzClusterWs {
     public static class QuartzClusterJob implements Job {
 
         public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-            System.out.println("Executing job: "+jobExecutionContext.getFireInstanceId() +" "+ jobExecutionContext.getFireTime());
-        }
+            System.out.println("Executing job: "+jobExecutionContext.getJobDetail().getKey().getName()
+                    +" "+ jobExecutionContext.getFireTime()+" "+jobExecutionContext.getFireInstanceId());        }
     }
 
     @WebService(endpointInterface = "com.examples.QuartzClusterWs$QuartzClusterService")
@@ -70,7 +70,7 @@ public class QuartzClusterWs {
         }
         public void addJob(String jobName, int interval) throws SchedulerException {
             System.out.println("Adding a job to scheduler: " + jobName +" "+ new Timestamp(System.currentTimeMillis()));
-            JobDetail jobDetail =  newJob(QuartzClusterJob.class).build();
+            JobDetail jobDetail =  newJob(QuartzClusterJob.class).withIdentity(jobName).requestRecovery().build();
             Trigger trigger = newTrigger().startAt(DateBuilder.futureDate(interval, DateBuilder.IntervalUnit.SECOND)).build();
             scheduler.scheduleJob(jobDetail, trigger);
         }
